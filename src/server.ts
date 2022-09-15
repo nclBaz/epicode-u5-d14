@@ -1,13 +1,11 @@
 import express from "express"
-import listEndpoints from "express-list-endpoints"
 import cors from "cors"
-import mongoose from "mongoose"
 import { Server } from "socket.io"
 import { createServer } from "http" // CORE MODULE
 import { newConnectionHandler } from "./socket"
+import usersRouter from "./api/users"
 
 const expressServer = express()
-const port = process.env.PORT || 3001
 
 // ************************ SOCKETIO **********************
 
@@ -16,18 +14,11 @@ const io = new Server(httpServer)
 io.on("connection", newConnectionHandler) // NOT a custom event! this is triggered every time a new client connects here
 
 // *********************** MIDDLEWARES ********************
+expressServer.use(express.json())
 
 // ************************* ENDPOINTS ********************
+expressServer.use("/users", usersRouter)
 
 // *********************** ERROR HANDLERS *****************
-if (process.env.MONGO_URL) mongoose.connect(process.env.MONGO_URL)
-// alternative method mongoose.connect(process.env.MONGO_URL!)
-else throw new Error("Mongo url missing!")
 
-mongoose.connection.on("connected", () =>
-  httpServer.listen(port, () => {
-    // DO NOT FORGET TO LISTEN WITH HTTPSERVER HERE NOT EXPRESS SERVER!!
-    console.table(listEndpoints(expressServer))
-    console.log(`Server is running on port ${port}`)
-  })
-)
+export { httpServer, expressServer }
