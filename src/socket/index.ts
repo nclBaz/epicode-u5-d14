@@ -1,6 +1,12 @@
-let onlineUsers = []
+import { Socket } from "socket.io"
+interface OnlineUser {
+  username: String
+  socketId: String
+}
 
-export const newConnectionHandler = client => {
+let onlineUsers: OnlineUser[] = []
+
+export const newConnectionHandler = (client: Socket) => {
   // connection established with client represented by the socket object
   // console.log("SOCKET: ", socket.id)
 
