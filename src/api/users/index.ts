@@ -1,5 +1,6 @@
 import express from "express"
 import createError from "http-errors"
+import { JWTAuthMiddleware } from "../../lib/auth/token"
 import { createAccessToken } from "../../lib/auth/tools"
 import UsersModel from "../../models/users"
 
@@ -15,7 +16,7 @@ usersRouter.post("/", async (req, res, next) => {
   }
 })
 
-usersRouter.get("/", async (req, res, next) => {
+usersRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const users = await UsersModel.find()
     res.send(users)
@@ -30,7 +31,10 @@ usersRouter.post("/login", async (req, res, next) => {
 
     const user = await UsersModel.checkCredentials(email, password)
     if (user) {
-      const accessToken = await createAccessToken({ _id: user._id })
+      const accessToken = await createAccessToken({
+        _id: user._id,
+        role: user.role,
+      })
       res.send({ accessToken })
     } else {
       next(createError(401, "Credentials are not ok!"))

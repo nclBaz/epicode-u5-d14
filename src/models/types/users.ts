@@ -4,6 +4,7 @@ interface User {
   firstName: string
   email: string
   password: string
+  role: "User" | "Admin"
 }
 
 export interface UserDocument extends User, Document {}
