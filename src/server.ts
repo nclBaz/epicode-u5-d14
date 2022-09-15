@@ -20,8 +20,8 @@ io.on("connection", newConnectionHandler) // NOT a custom event! this is trigger
 // ************************* ENDPOINTS ********************
 
 // *********************** ERROR HANDLERS *****************
-
-mongoose.connect(process.env.MONGO_URL)
+if (process.env.MONGO_URL) mongoose.connect(process.env.MONGO_URL)
+else throw new Error("Mongo url missing!")
 
 mongoose.connection.on("connected", () =>
   httpServer.listen(port, () => {
